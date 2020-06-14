@@ -1,0 +1,26 @@
+#!/bin/sh /etc/rc.common
+START=97
+STOP=99
+
+USE_PROCD=1
+PROG=/mnt/UDISK/image_uploader
+OOM_ADJ=-17
+
+start_service() {
+	
+	procd_open_instance
+	procd_set_param oom_adj $OOM_ADJ
+    procd_set_param env MQTT_BROKER_URL="mqtt://USERNAME:PASSWORD@mosquito:1883" FILENAME="/mnt/UDISK/log/0_png.png"
+    #NAME=
+    #UNIQUE_ID=
+    #TOPIC=
+    #AUTO_CONF_PREFIX=
+	procd_set_param command $PROG
+	procd_set_param stdout 1 # forward stdout of the command to logd
+	procd_set_param stderr 1 # same for stderr
+	procd_close_instance
+}
+
+shutdown() {
+	echo shutdown
+}
