@@ -21,22 +21,26 @@ const client = mqtt.connect(MQTT_BROKER_URL)
 client.on('connect', () => console.log(`MQTT connection to ${MQTT_BROKER_URL} established.`))
 client.on('error', console.error)
 
+let publishOptions = {
+    retain: true
+}
+
 if (AUTO_CONF_PREFIX.trim()) {
     const autoConfTopic = `${AUTO_CONF_PREFIX}/camera/image_uploader_${UNIQUE_ID}/config`
     client.publish(autoConfTopic, JSON.stringify({
         name: NAME,
         unique_id: UNIQUE_ID,
         topic: TOPIC
-    }), { retain: true }, console.log)
+    }), publishOptions, console.log)
     console.log(`Auto config published to '${autoConfTopic}'`)
 }
 
-client.publish(TOPIC, fs.readFileSync(FILENAME), console.log)
+client.publish(TOPIC, fs.readFileSync(FILENAME), publishOptions, console.log)
 console.log('Published image')
 
 fs.watch(FILENAME, function (event, name) {
     if (event == 'change') {
-        client.publish(TOPIC, fs.readFileSync(FILENAME), console.log)
+        client.publish(TOPIC, fs.readFileSync(FILENAME), publishOptions, console.log)
         console.log('Published image')
     }
 });
